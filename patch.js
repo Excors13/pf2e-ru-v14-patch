@@ -48,8 +48,9 @@ Hooks.once("ready", async () => {
 
       if (!actionData?.Description) return;
 
-      const descriptionBody =
-        html.find('.tab[data-tab="description"] .item-description').first();
+      const descriptionBody = html
+        .find('.tab.description[data-tab="description"] .main.editor-container .editor-content')
+        .first();
 
       if (descriptionBody.length) {
         descriptionBody.html(actionData.Description);
