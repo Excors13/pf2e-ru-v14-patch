@@ -1,4 +1,4 @@
-Hooks.once("ready", async () => {
+Hooks.on("renderCompendiumBrowser", async () => {
   if (game.system.id !== "pf2e") return;
 
   const browser = game.pf2e?.compendiumBrowser;
