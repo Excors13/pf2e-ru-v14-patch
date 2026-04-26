@@ -1,31 +1,33 @@
 Hooks.once("ready", async () => {
   if (game.system.id !== "pf2e") return;
 
-const translations = {
-  "Grapple": "Захватить",
-  "Disarm": "Разоружение",
-  "Shove": "Толчок",
-  "Trip": "Подсечка",
-  "Demoralize": "Деморализовать"
-};
-
   const browser = game.pf2e?.compendiumBrowser;
-  if (!browser) return;
-
-  const tab = browser.tabs?.action;
+  const tab = browser?.tabs?.action;
   if (!tab) return;
+
+  const response = await fetch("modules/pf2e-ru-v14-patch/action-pf2e.json");
+  const data = await response.json();
+
+  const translations = {};
+  for (const [englishName, value] of Object.entries(data)) {
+    if (value?.Title) translations[englishName] = value.Title;
+  }
 
   await tab.init?.();
 
   const fields = tab.searchEngine?._storedFields;
   if (!fields) return;
 
+  let count = 0;
+
   for (const entry of fields.values()) {
-    if (translations[entry.name]) {
-      entry.originalName = entry.name;
-      entry.name = `${translations[entry.name]} — ${entry.name}`;
-    }
+    const ru = translations[entry.name];
+    if (!ru) continue;
+
+    entry.originalName = entry.name;
+    entry.name = `${ru} — ${entry.name}`;
+    count++;
   }
 
-  console.log("PF2e RU Patch loaded");
+  console.log(`PF2e RU V14 Patch: patched ${count} action names`);
 });
