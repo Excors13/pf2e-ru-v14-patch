@@ -11,9 +11,15 @@ Hooks.once("ready", async () => {
     const data = await response.json();
     const actions = data.PF2E.Actions;
 
+    // -----------------------------
+    // Названия действий в браузере
+    // -----------------------------
     const translations = {};
+
     for (const [englishKey, value] of Object.entries(actions)) {
-      if (value?.Title) translations[normalize(englishKey)] = value.Title;
+      if (value?.Title) {
+        translations[normalize(englishKey)] = value.Title;
+      }
     }
 
     const browser = game.pf2e?.compendiumBrowser;
@@ -37,19 +43,35 @@ Hooks.once("ready", async () => {
       count++;
     }
 
+    console.log(`PF2e RU V14 Patch: patched ${count} action names`);
+
+    // -----------------------------
+    // Русские описания действий
+    // -----------------------------
     Hooks.on("renderItemSheet", (app) => {
       const item = app.document;
       if (!item || item.type !== "action") return;
 
-      const key = normalize(item.system?.slug ?? item.name);
-      const actionData = actions[Object.keys(actions).find((k) => normalize(k) === key)];
+      // Защита от повторной подмены
+      if (item.flags?.pf2eruPatched) return;
 
-      if (actionData?.Description) {
-        item.system.description.value = actionData.Description;
-        app.render(true);
-      }
+      const key = normalize(item.system?.slug ?? item.name);
+
+      const actionData =
+        actions[
+          Object.keys(actions).find(
+            (k) => normalize(k) === key
+          )
+        ];
+
+      if (!actionData?.Description) return;
+
+      item.system.description.value = actionData.Description;
+
+      item.flags.pf2eruPatched = true;
+
+      app.render(true);
     });
 
-    console.log(`PF2e RU V14 Patch: patched ${count} action names`);
   }, 3000);
 });
