@@ -1,33 +1,35 @@
-Hooks.on("renderCompendiumBrowser", async () => {
-  if (game.system.id !== "pf2e") return;
+Hooks.once("ready", async () => {
+  setTimeout(async () => {
+    if (game.system.id !== "pf2e") return;
 
-  const browser = game.pf2e?.compendiumBrowser;
-  const tab = browser?.tabs?.action;
-  if (!tab) return;
+    const browser = game.pf2e?.compendiumBrowser;
+    const tab = browser?.tabs?.action;
+    if (!tab) return;
 
-  const response = await fetch("modules/pf2e-ru-v14-patch/action-pf2e.json");
-  const data = await response.json();
+    const response = await fetch("modules/pf2e-ru-v14-patch/action-pf2e.json");
+    const data = await response.json();
 
-  const translations = {};
-  for (const [englishName, value] of Object.entries(data.PF2E.Actions) {
-    if (value?.Title) translations[englishName] = value.Title;
-  }
+    const translations = {};
+    for (const [englishName, value] of Object.entries(data.PF2E.Actions)) {
+      if (value?.Title) translations[englishName] = value.Title;
+    }
 
-  await tab.init?.();
+    await tab.init?.();
 
-  const fields = tab.searchEngine?._storedFields;
-  if (!fields) return;
+    const fields = tab.searchEngine?._storedFields;
+    if (!fields) return;
 
-  let count = 0;
+    let count = 0;
 
-  for (const entry of fields.values()) {
-    const ru = translations[entry.name];
-    if (!ru) continue;
+    for (const entry of fields.values()) {
+      const ru = translations[entry.name];
+      if (!ru) continue;
 
-    entry.originalName = entry.name;
-    entry.name = `${ru} — ${entry.name}`;
-    count++;
-  }
+      entry.originalName = entry.name;
+      entry.name = `${ru} — ${entry.name}`;
+      count++;
+    }
 
-  console.log(`PF2e RU V14 Patch: patched ${count} action names`);
+    console.log(`PF2e RU V14 Patch: patched ${count} action names`);
+  }, 3000);
 });
