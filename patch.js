@@ -11,9 +11,6 @@ Hooks.once("ready", async () => {
     const data = await response.json();
     const actions = data.PF2E.Actions;
 
-    // -----------------------------
-    // Названия действий в браузере
-    // -----------------------------
     const translations = {};
 
     for (const [englishKey, value] of Object.entries(actions)) {
@@ -44,39 +41,5 @@ Hooks.once("ready", async () => {
     }
 
     console.log(`PF2e RU V14 Patch: patched ${count} action names`);
-
-    // -----------------------------
-    // Русские описания действий
-    // -----------------------------
-    const patchedSheets = new WeakSet();
-
-    const patchActionSheet = (app) => {
-      if (patchedSheets.has(app)) return;
-
-      const item = app.document;
-      if (!item || item.type !== "action") return;
-
-      const key = normalize(item.system?.slug ?? item.name);
-
-      const actionData =
-        actions[
-          Object.keys(actions).find(
-            (k) => normalize(k) === key
-          )
-        ];
-
-      if (!actionData?.Description) return;
-
-      item.updateSource({
-        "system.description.value": actionData.Description
-      });
-
-      patchedSheets.add(app);
-
-      app.render(true);
-    };
-
-    Hooks.on("renderAbilitySheetPF2e", patchActionSheet);
-
   }, 3000);
 });
