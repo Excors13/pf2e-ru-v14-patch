@@ -38,7 +38,7 @@ Hooks.once("ready", async () => {
 
     console.log(`PF2e RU V14 Patch: patched ${count} action names`);
 
-    Hooks.on("renderAbilitySheetPF2e", (app, html) => {
+    Hooks.on("renderAbilitySheetPF2e", async (app, html) => {
       const item = app.document;
       if (!item || item.type !== "action") return;
 
@@ -62,7 +62,13 @@ Hooks.once("ready", async () => {
         .first();
 
       if (descriptionBody.length) {
-        descriptionBody.html(actionData.Description);
+        const enrichedDescription = await TextEditor.enrichHTML(actionData.Description, {
+          async: true,
+          documents: true,
+          secrets: false,
+        });
+
+        descriptionBody.html(enrichedDescription);
       }
     });
   }, 3000);
