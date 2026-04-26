@@ -23,7 +23,7 @@ Hooks.once("ready", async () => {
   for (const entry of fields.values()) {
     if (translations[entry.name]) {
       entry.originalName = entry.name;
-      entry.name = translations[entry.name];
+      entry.name = `${translations[entry.name]} — ${entry.name}`;
     }
   }
 
