@@ -1,6 +1,14 @@
 Hooks.once("ready", async () => {
   if (game.system.id !== "pf2e") return;
 
+  const translations = {
+    "Grapple": "Захват",
+    "Disarm": "Разоружение",
+    "Shove": "Толчок",
+    "Trip": "Подсечка",
+    "Demoralize": "Деморализация"
+  };
+
   const browser = game.pf2e?.compendiumBrowser;
   if (!browser) return;
 
@@ -13,11 +21,11 @@ Hooks.once("ready", async () => {
   if (!fields) return;
 
   for (const entry of fields.values()) {
-    if (entry.name === "Grapple") {
+    if (translations[entry.name]) {
       entry.originalName = entry.name;
-      entry.name = "Захват";
+      entry.name = translations[entry.name];
     }
   }
 
-  console.log("PF2e RU V14 Patch: action names patched");
+  console.log("PF2e RU Patch loaded");
 });
