@@ -48,12 +48,13 @@ Hooks.once("ready", async () => {
     // -----------------------------
     // Русские описания действий
     // -----------------------------
-    Hooks.on("renderApplication", (app) => {
+    const patchedSheets = new WeakSet();
+
+    const patchActionSheet = (app) => {
+      if (patchedSheets.has(app)) return;
+
       const item = app.document;
       if (!item || item.type !== "action") return;
-
-      // Защита от повторной подмены
-      if (item.flags?.pf2eruPatched) return;
 
       const key = normalize(item.system?.slug ?? item.name);
 
@@ -66,12 +67,16 @@ Hooks.once("ready", async () => {
 
       if (!actionData?.Description) return;
 
-      item.system.description.value = actionData.Description;
+      item.updateSource({
+        "system.description.value": actionData.Description
+      });
 
-      item.flags.pf2eruPatched = true;
+      patchedSheets.add(app);
 
       app.render(true);
-    });
+    };
+
+    Hooks.on("renderAbilitySheetPF2e", patchActionSheet);
 
   }, 3000);
 });
