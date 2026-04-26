@@ -5,7 +5,7 @@ Hooks.once("ready", async () => {
     const normalize = (text) =>
       String(text ?? "")
         .toLowerCase()
-        .replace(/[^a-z0-9]/g, "");
+        .replace(/[^a-z0-9а-яё]/g, "");
 
     const response = await fetch("modules/pf2e-ru-v14-patch/action-pf2e.json");
     const data = await response.json();
@@ -13,7 +13,9 @@ Hooks.once("ready", async () => {
 
     const translations = {};
     for (const [englishKey, value] of Object.entries(actions)) {
-      if (value?.Title) translations[normalize(englishKey)] = value.Title;
+      if (value?.Title) {
+        translations[normalize(englishKey)] = value.Title;
+      }
     }
 
     const browser = game.pf2e?.compendiumBrowser;
@@ -26,13 +28,24 @@ Hooks.once("ready", async () => {
     if (!fields) return;
 
     let count = 0;
+
     for (const entry of fields.values()) {
       const key = normalize(entry.name);
       const ru = translations[key];
       if (!ru) continue;
 
       entry.originalName = entry.name;
+
+      // Русское + английское имя
       entry.name = `${ru} — ${entry.name}`;
+
+      // Обновить поисковый индекс
+      try {
+        tab.searchEngine.replace(entry);
+      } catch (err) {
+        console.warn("Search replace failed", err);
+      }
+
       count++;
     }
 
@@ -43,16 +56,26 @@ Hooks.once("ready", async () => {
       if (!item || item.type !== "action") return;
 
       const key = normalize(item.system?.slug ?? item.name);
+
       const actionData =
-        actions[Object.keys(actions).find((k) => normalize(k) === key)];
+        actions[
+          Object.keys(actions).find(
+            (k) => normalize(k) === key
+          )
+        ];
 
       if (!actionData) return;
 
-      const ruTitle = actionData.Title;
-      if (ruTitle) {
-        html.find('input[name="name"]').val(`${ruTitle} — ${item.name}`);
-        html.closest(".window-app").find(".window-title").contents().first()[0].textContent =
-          `${ruTitle} — ${item.name}`;
+      if (actionData.Title) {
+        html.find('input[name="name"]').val(
+          `${actionData.Title} — ${item.name}`
+        );
+
+        html.closest(".window-app")
+          .find(".window-title")
+          .contents()
+          .first()[0].textContent =
+            `${actionData.Title} — ${item.name}`;
       }
 
       if (!actionData.Description) return;
@@ -62,14 +85,18 @@ Hooks.once("ready", async () => {
         .first();
 
       if (descriptionBody.length) {
-        const enrichedDescription = await TextEditor.enrichHTML(actionData.Description, {
-          async: true,
-          documents: true,
-          secrets: false,
-        });
+        const enrichedDescription = await TextEditor.enrichHTML(
+          actionData.Description,
+          {
+            async: true,
+            documents: true,
+            secrets: false
+          }
+        );
 
         descriptionBody.html(enrichedDescription);
       }
     });
+
   }, 3000);
 });
