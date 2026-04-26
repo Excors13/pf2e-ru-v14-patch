@@ -46,7 +46,16 @@ Hooks.once("ready", async () => {
       const actionData =
         actions[Object.keys(actions).find((k) => normalize(k) === key)];
 
-      if (!actionData?.Description) return;
+      if (!actionData) return;
+
+      const ruTitle = actionData.Title;
+      if (ruTitle) {
+        html.find('input[name="name"]').val(`${ruTitle} — ${item.name}`);
+        html.closest(".window-app").find(".window-title").contents().first()[0].textContent =
+          `${ruTitle} — ${item.name}`;
+      }
+
+      if (!actionData.Description) return;
 
       const descriptionBody = html
         .find('.tab.description[data-tab="description"] .main.editor-container .editor-content')
