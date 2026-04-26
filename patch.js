@@ -11,6 +11,9 @@ Hooks.once("ready", async () => {
     const data = await response.json();
     const actions = data.PF2E.Actions;
 
+    // -----------------------------
+    // Перевод названий в браузере
+    // -----------------------------
     const translations = {};
 
     for (const [englishKey, value] of Object.entries(actions)) {
@@ -41,5 +44,31 @@ Hooks.once("ready", async () => {
     }
 
     console.log(`PF2e RU V14 Patch: patched ${count} action names`);
+
+    // -----------------------------
+    // Визуальная подмена описаний
+    // -----------------------------
+    Hooks.on("renderAbilitySheetPF2e", (app, html) => {
+      const item = app.document;
+      if (!item || item.type !== "action") return;
+
+      const key = normalize(item.system?.slug ?? item.name);
+
+      const actionData =
+        actions[
+          Object.keys(actions).find(
+            (k) => normalize(k) === key
+          )
+        ];
+
+      if (!actionData?.Description) return;
+
+      const descriptionTab = html.find('[data-tab="description"]');
+
+      if (descriptionTab.length) {
+        descriptionTab.html(actionData.Description);
+      }
+    });
+
   }, 3000);
 });
