@@ -2,6 +2,11 @@ Hooks.once("ready", async () => {
   setTimeout(async () => {
     if (game.system.id !== "pf2e") return;
 
+    const normalize = (text) =>
+      String(text ?? "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+
     const browser = game.pf2e?.compendiumBrowser;
     const tab = browser?.tabs?.action;
     if (!tab) return;
@@ -10,8 +15,10 @@ Hooks.once("ready", async () => {
     const data = await response.json();
 
     const translations = {};
-    for (const [englishName, value] of Object.entries(data.PF2E.Actions)) {
-      if (value?.Title) translations[englishName] = value.Title;
+    for (const [englishKey, value] of Object.entries(data.PF2E.Actions)) {
+      if (value?.Title) {
+        translations[normalize(englishKey)] = value.Title;
+      }
     }
 
     await tab.init?.();
@@ -22,7 +29,8 @@ Hooks.once("ready", async () => {
     let count = 0;
 
     for (const entry of fields.values()) {
-      const ru = translations[entry.name];
+      const key = normalize(entry.name);
+      const ru = translations[key];
       if (!ru) continue;
 
       entry.originalName = entry.name;
