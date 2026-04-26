@@ -11,15 +11,9 @@ Hooks.once("ready", async () => {
     const data = await response.json();
     const actions = data.PF2E.Actions;
 
-    // -----------------------------
-    // Перевод названий в браузере
-    // -----------------------------
     const translations = {};
-
     for (const [englishKey, value] of Object.entries(actions)) {
-      if (value?.Title) {
-        translations[normalize(englishKey)] = value.Title;
-      }
+      if (value?.Title) translations[normalize(englishKey)] = value.Title;
     }
 
     const browser = game.pf2e?.compendiumBrowser;
@@ -32,7 +26,6 @@ Hooks.once("ready", async () => {
     if (!fields) return;
 
     let count = 0;
-
     for (const entry of fields.values()) {
       const key = normalize(entry.name);
       const ru = translations[key];
@@ -45,30 +38,22 @@ Hooks.once("ready", async () => {
 
     console.log(`PF2e RU V14 Patch: patched ${count} action names`);
 
-    // -----------------------------
-    // Визуальная подмена описаний
-    // -----------------------------
     Hooks.on("renderAbilitySheetPF2e", (app, html) => {
       const item = app.document;
       if (!item || item.type !== "action") return;
 
       const key = normalize(item.system?.slug ?? item.name);
-
       const actionData =
-        actions[
-          Object.keys(actions).find(
-            (k) => normalize(k) === key
-          )
-        ];
+        actions[Object.keys(actions).find((k) => normalize(k) === key)];
 
       if (!actionData?.Description) return;
 
-      const descriptionTab = html.find('[data-tab="description"]');
+      const descriptionBody =
+        html.find('.tab[data-tab="description"] .item-description').first();
 
-      if (descriptionTab.length) {
-        descriptionTab.html(actionData.Description);
+      if (descriptionBody.length) {
+        descriptionBody.html(actionData.Description);
       }
     });
-
   }, 3000);
 });
