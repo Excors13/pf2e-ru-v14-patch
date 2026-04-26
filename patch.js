@@ -41,7 +41,7 @@ Hooks.once("ready", async () => {
       const item = app.document;
       if (!item || item.type !== "action") return;
 
-      const key = normalize(item.name);
+      const key = normalize(item.system?.slug ?? item.name);
       const actionData = actions[Object.keys(actions).find((k) => normalize(k) === key)];
 
       if (actionData?.Description) {
