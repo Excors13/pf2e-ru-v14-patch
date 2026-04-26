@@ -1,0 +1,29 @@
+{
+  "id": "pf2e-ru-v14-patch",
+  "title": "PF2e RU V14 Patch",
+  "description": "Личный тестовый патч перевода PF2e для Foundry V14.",
+  "version": "0.0.1",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14"
+  },
+  "authors": [
+    {
+      "name": "Personal"
+    }
+  ],
+  "relationships": {
+    "systems": [
+      {
+        "id": "pf2e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "8"
+        }
+      }
+    ]
+  },
+  "scripts": [
+    "patch.js"
+  ]
+}
