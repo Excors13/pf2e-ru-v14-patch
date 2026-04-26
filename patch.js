@@ -9,7 +9,7 @@ Hooks.once("ready", async () => {
   const data = await response.json();
 
   const translations = {};
-  for (const [englishName, value] of Object.entries(data)) {
+  for (const [englishName, value] of Object.entries(data.PF2E)) {
     if (value?.Title) translations[englishName] = value.Title;
   }
 
