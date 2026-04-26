@@ -3,6 +3,8 @@
   "title": "PF2e RU V14 Patch",
   "description": "Личный тестовый патч перевода PF2e для Foundry V14.",
   "version": "0.0.1",
+  "manifest": "https://raw.githubusercontent.com/Excors13/pf2e-ru-v14-patch/main/module.json",
+  "download": "https://github.com/Excors13/pf2e-ru-v14-patch/archive/refs/heads/main.zip",
   "compatibility": {
     "minimum": "14",
     "verified": "14"
