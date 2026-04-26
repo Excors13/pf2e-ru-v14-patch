@@ -1,13 +1,13 @@
 Hooks.once("ready", async () => {
   if (game.system.id !== "pf2e") return;
 
-  const translations = {
-    "Grapple": "Захват",
-    "Disarm": "Разоружение",
-    "Shove": "Толчок",
-    "Trip": "Подсечка",
-    "Demoralize": "Деморализация"
-  };
+const translations = {
+  "Grapple": "Захватить",
+  "Disarm": "Разоружение",
+  "Shove": "Толчок",
+  "Trip": "Подсечка",
+  "Demoralize": "Деморализовать"
+};
 
   const browser = game.pf2e?.compendiumBrowser;
   if (!browser) return;
