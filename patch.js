@@ -48,7 +48,7 @@ Hooks.once("ready", async () => {
     // -----------------------------
     // Русские описания действий
     // -----------------------------
-    Hooks.on("renderItemSheet", (app) => {
+    Hooks.on("renderApplication", (app) => {
       const item = app.document;
       if (!item || item.type !== "action") return;
 
