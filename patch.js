@@ -7,19 +7,18 @@ Hooks.once("ready", async () => {
         .toLowerCase()
         .replace(/[^a-z0-9]/g, "");
 
+    const response = await fetch("modules/pf2e-ru-v14-patch/action-pf2e.json");
+    const data = await response.json();
+    const actions = data.PF2E.Actions;
+
+    const translations = {};
+    for (const [englishKey, value] of Object.entries(actions)) {
+      if (value?.Title) translations[normalize(englishKey)] = value.Title;
+    }
+
     const browser = game.pf2e?.compendiumBrowser;
     const tab = browser?.tabs?.action;
     if (!tab) return;
-
-    const response = await fetch("modules/pf2e-ru-v14-patch/action-pf2e.json");
-    const data = await response.json();
-
-    const translations = {};
-    for (const [englishKey, value] of Object.entries(data.PF2E.Actions)) {
-      if (value?.Title) {
-        translations[normalize(englishKey)] = value.Title;
-      }
-    }
 
     await tab.init?.();
 
@@ -37,6 +36,19 @@ Hooks.once("ready", async () => {
       entry.name = `${ru} — ${entry.name}`;
       count++;
     }
+
+    Hooks.on("renderItemSheet", (app) => {
+      const item = app.document;
+      if (!item || item.type !== "action") return;
+
+      const key = normalize(item.name);
+      const actionData = actions[Object.keys(actions).find((k) => normalize(k) === key)];
+
+      if (actionData?.Description) {
+        item.system.description.value = actionData.Description;
+        app.render(true);
+      }
+    });
 
     console.log(`PF2e RU V14 Patch: patched ${count} action names`);
   }, 3000);
